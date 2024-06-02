@@ -3,6 +3,8 @@ import { copyFinalDist, downloadS3Folder } from "./aws";
 import { buildproject } from "./utils";
 const subscriber = createClient()
 subscriber.connect()
+const publisher = createClient()
+publisher.connect()
 
 async function main () {
     while(1){
@@ -17,6 +19,8 @@ async function main () {
         console.log("downloded");
         await buildproject(id);
         await copyFinalDist(id);
+
+        publisher.hSet("status", id, "Deployed")
     }
 }
 
