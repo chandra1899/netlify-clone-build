@@ -26,7 +26,7 @@ function main() {
             console.log("downloded");
             yield (0, utils_1.buildproject)(id);
             yield (0, aws_1.copyFinalDist)(id);
-            publisher.hSet("status", id, "Deployed");
+            publisher.hSet("status", id, "deployed");
         }
     });
 }
