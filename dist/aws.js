@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadS3Folder = void 0;
+exports.copyFinalDist = exports.downloadS3Folder = void 0;
 const aws_sdk_1 = require("aws-sdk");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -54,3 +54,46 @@ function downloadS3Folder(prefix) {
     });
 }
 exports.downloadS3Folder = downloadS3Folder;
+const getAllFiles = (folderpath) => {
+    let response = [];
+    const allFilesAndFolders = fs_1.default.readdirSync(folderpath);
+    allFilesAndFolders.forEach(file => {
+        const fullFilePath = path_1.default.join(folderpath, file);
+        if (fs_1.default.statSync(fullFilePath).isDirectory()) {
+            response = response.concat(getAllFiles(fullFilePath));
+        }
+        else {
+            response.push(fullFilePath);
+        }
+    });
+    return response;
+};
+const uploadFile = (fileName, localFilePath) => __awaiter(void 0, void 0, void 0, function* () {
+    const fileContent = fs_1.default.readFileSync(localFilePath);
+    const response = yield s3.upload({
+        Body: fileContent,
+        Bucket: "vercel",
+        Key: fileName,
+    }).promise();
+    console.log(response);
+});
+const parseFile = (filepath) => {
+    let s = "";
+    for (let i = 0; i < filepath.length; i++) {
+        if (filepath[i] === '\\') {
+            s += '/';
+        }
+        else {
+            s += filepath[i];
+        }
+    }
+    return s;
+};
+function copyFinalDist(id) {
+    const folderPath = path_1.default.join(__dirname, `output/${id}/dist`);
+    const allFiles = getAllFiles(folderPath);
+    allFiles.forEach(file => {
+        uploadFile(`dist/${id}/` + parseFile(file).slice(folderPath.length + 1), file);
+    });
+}
+exports.copyFinalDist = copyFinalDist;
