@@ -20,7 +20,7 @@ async function main () {
         await buildproject(id);
         await copyFinalDist(id);
 
-        publisher.hSet("status", id, "Deployed")
+        publisher.hSet("status", id, "deployed")
     }
 }
 
