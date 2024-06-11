@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const redis_1 = require("redis");
 const aws_1 = require("./aws");
 const utils_1 = require("./utils");
+const updatestatus_1 = require("./updatestatus");
 const subscriber = (0, redis_1.createClient)();
 subscriber.connect();
 const publisher = (0, redis_1.createClient)();
@@ -24,8 +25,13 @@ function main() {
             const id = res.element;
             yield (0, aws_1.downloadS3Folder)(`output/${id}`);
             console.log("downloded");
+            yield (0, updatestatus_1.updatestatus)(id, "building");
+            publisher.hSet("status", id, "building...");
             yield (0, utils_1.buildproject)(id);
+            yield (0, updatestatus_1.updatestatus)(id, "build");
+            publisher.hSet("status", id, "deploying...");
             yield (0, aws_1.copyFinalDist)(id);
+            yield (0, updatestatus_1.updatestatus)(id, "deployed");
             publisher.hSet("status", id, "deployed");
         }
     });

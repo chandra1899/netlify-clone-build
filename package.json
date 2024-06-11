@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1632.0",
+    "axios": "^1.7.2",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
     "path": "^0.12.7",
