@@ -4,32 +4,38 @@ import { buildproject } from "./utils";
 import { updatestatus } from "./updatestatus";
 import { deleteFolder } from "./deleteFolder";
 import path from "path"
-const subscriber = createClient()
-subscriber.connect()
-const publisher = createClient()
-publisher.connect()
+import Redis from "ioredis"
+const publisher = new Redis({
+    host : process.env.REDIS_HOST as string,
+    port : parseInt(process.env.REDIS_PORT as string) as number,
+    username : process.env.REDIS_USERNAME as string,
+    password : process.env.REDIS_PASSWORD as string
+})
+
+const subscriber = new Redis({
+    host : process.env.REDIS_HOST as string,
+    port : parseInt(process.env.REDIS_PORT as string) as number,
+    username : process.env.REDIS_USERNAME as string,
+    password : process.env.REDIS_PASSWORD as string
+})
 
 async function main () {
     while(1){
-        const res = await subscriber.brPop(
-            commandOptions({ isolated : true }),
-            "build-queue",
-            0
-            );
+        const res = await subscriber.brpop('build-queue', 0);
             // @ts-ignore
-            const id = res.element
+            const id = res[1]
             await downloadS3Folder(`output/${id}`)
             console.log("downloded");
             
             await updatestatus(id, "building")
 
-            publisher.hSet("status", id, "building...")
+            await publisher.hset("status", id, "building...")
             await buildproject(id);
             
             await updatestatus(id, "build")
 
-            publisher.hSet("status", id, "build...")
-            publisher.hSet("status", id, "deploying...")
+            await publisher.hset("status", id, "build...")
+            await publisher.hset("status", id, "deploying...")
             await copyFinalDist(id); 
             console.log("deleting files");
             
@@ -38,7 +44,7 @@ async function main () {
             
             await updatestatus(id, "deployed")
 
-        publisher.hSet("status", id, "deployed")
+        await publisher.hset("status", id, "deployed")
     }
 }
 

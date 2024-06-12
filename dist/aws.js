@@ -17,9 +17,9 @@ const aws_sdk_1 = require("aws-sdk");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const s3 = new aws_sdk_1.S3({
-    accessKeyId: "a915a83a984ca573f61e6f3eab99daee",
-    secretAccessKey: "a87f1c585a44ae708ffdd6a2e390d46f79bc1d041fe07a7cc3e793b4c831035e",
-    endpoint: "https://04b74d21ee5c34d7a6a3405431dac7ec.r2.cloudflarestorage.com"
+    accessKeyId: process.env.AWS_ACCESSKEYID,
+    secretAccessKey: process.env.AWS_SECRETACCESSKEY,
+    endpoint: process.env.AWS_ENDPOINT
 });
 function downloadS3Folder(prefix) {
     var _a;
