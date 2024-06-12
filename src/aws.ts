@@ -9,7 +9,8 @@ const s3 = new S3({
 })
 
 export async function downloadS3Folder (prefix: string) {
-    console.log(prefix);
+    try {
+        // console.log(prefix);
     const allFiles = await s3.listObjectsV2({
         Bucket: "vercel",
         Prefix: prefix
@@ -35,9 +36,12 @@ export async function downloadS3Folder (prefix: string) {
             })
         })
     }) || []
-    console.log("waiting");
+    // console.log("waiting");
     
-    await Promise.all(allPromises?.filter(x => x !== undefined))
+        await Promise.all(allPromises?.filter(x => x !== undefined))
+    } catch (error) {
+        console.log("error in downloads3folder", error);
+    }
 }
 
 const getAllFiles = (folderpath : string) => {
@@ -55,14 +59,17 @@ const getAllFiles = (folderpath : string) => {
 }
 
 const uploadFile = async (fileName : string, localFilePath : string) => {
-    const fileContent = fs.readFileSync(localFilePath);
-    const response = await s3.upload({
-        Body: fileContent,
-        Bucket:"vercel",
-        Key: fileName,
-    }).promise();
-    console.log(response);
-    
+    try {
+        const fileContent = fs.readFileSync(localFilePath);
+        const response = await s3.upload({
+            Body: fileContent,
+            Bucket:"vercel",
+            Key: fileName,
+        }).promise();
+        // console.log(response);
+    } catch (error) {
+        console.log("error in uploadFile", error);
+    }
 }
 
 const parseFile = (filepath : string) => {

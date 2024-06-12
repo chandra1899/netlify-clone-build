@@ -1,7 +1,7 @@
 
 export const updatestatus =async (id : string, status : string) => {
     try {
-        await fetch('http://localhost:8000/api/updatestatus',{
+        await fetch(`${process.env.NEXTJS_BACKEND_URL}/api/updatestatus`,{
             method:'POST',
             headers:{
               'Access-Control-Allow-Origin': '*',

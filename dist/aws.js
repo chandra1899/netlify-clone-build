@@ -24,33 +24,38 @@ const s3 = new aws_sdk_1.S3({
 function downloadS3Folder(prefix) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(prefix);
-        const allFiles = yield s3.listObjectsV2({
-            Bucket: "vercel",
-            Prefix: prefix
-        }).promise();
-        const allPromises = ((_a = allFiles.Contents) === null || _a === void 0 ? void 0 : _a.map(({ Key }) => __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-                if (!Key) {
-                    resolve("");
-                    return;
-                }
-                const finalOutputPath = path_1.default.join(__dirname, Key);
-                const outputFile = fs_1.default.createWriteStream(finalOutputPath);
-                const dirName = path_1.default.dirname(finalOutputPath);
-                if (!fs_1.default.existsSync(dirName)) {
-                    fs_1.default.mkdirSync(dirName, { recursive: true });
-                }
-                s3.getObject({
-                    Bucket: "vercel",
-                    Key
-                }).createReadStream().pipe(outputFile).on("finish", () => {
-                    resolve("");
-                });
-            }));
-        }))) || [];
-        console.log("waiting");
-        yield Promise.all(allPromises === null || allPromises === void 0 ? void 0 : allPromises.filter(x => x !== undefined));
+        try {
+            // console.log(prefix);
+            const allFiles = yield s3.listObjectsV2({
+                Bucket: "vercel",
+                Prefix: prefix
+            }).promise();
+            const allPromises = ((_a = allFiles.Contents) === null || _a === void 0 ? void 0 : _a.map(({ Key }) => __awaiter(this, void 0, void 0, function* () {
+                return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                    if (!Key) {
+                        resolve("");
+                        return;
+                    }
+                    const finalOutputPath = path_1.default.join(__dirname, Key);
+                    const outputFile = fs_1.default.createWriteStream(finalOutputPath);
+                    const dirName = path_1.default.dirname(finalOutputPath);
+                    if (!fs_1.default.existsSync(dirName)) {
+                        fs_1.default.mkdirSync(dirName, { recursive: true });
+                    }
+                    s3.getObject({
+                        Bucket: "vercel",
+                        Key
+                    }).createReadStream().pipe(outputFile).on("finish", () => {
+                        resolve("");
+                    });
+                }));
+            }))) || [];
+            // console.log("waiting");
+            yield Promise.all(allPromises === null || allPromises === void 0 ? void 0 : allPromises.filter(x => x !== undefined));
+        }
+        catch (error) {
+            console.log("error in downloads3folder", error);
+        }
     });
 }
 exports.downloadS3Folder = downloadS3Folder;
@@ -69,13 +74,18 @@ const getAllFiles = (folderpath) => {
     return response;
 };
 const uploadFile = (fileName, localFilePath) => __awaiter(void 0, void 0, void 0, function* () {
-    const fileContent = fs_1.default.readFileSync(localFilePath);
-    const response = yield s3.upload({
-        Body: fileContent,
-        Bucket: "vercel",
-        Key: fileName,
-    }).promise();
-    console.log(response);
+    try {
+        const fileContent = fs_1.default.readFileSync(localFilePath);
+        const response = yield s3.upload({
+            Body: fileContent,
+            Bucket: "vercel",
+            Key: fileName,
+        }).promise();
+        // console.log(response);
+    }
+    catch (error) {
+        console.log("error in uploadFile", error);
+    }
 });
 const parseFile = (filepath) => {
     let s = "";
