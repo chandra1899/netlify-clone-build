@@ -87,23 +87,23 @@ const uploadFile = (fileName, localFilePath) => __awaiter(void 0, void 0, void 0
         console.log("error in uploadFile", error);
     }
 });
-const parseFile = (filepath) => {
-    let s = "";
-    for (let i = 0; i < filepath.length; i++) {
-        if (filepath[i] === '\\') {
-            s += '/';
-        }
-        else {
-            s += filepath[i];
-        }
-    }
-    return s;
-};
+// const parseFile = (filepath : string) => {
+//     let s = "";
+//     for(let i=0;i<filepath.length;i++){
+//         if(filepath[i] === '\\'){
+//             s += '/'
+//         } else {
+//             s += filepath[i]
+//         }
+//     }
+//     return s;
+// }
 function copyFinalDist(id) {
     const folderPath = path_1.default.join(__dirname, `output/${id}/dist`);
     const allFiles = getAllFiles(folderPath);
     allFiles.forEach(file => {
-        uploadFile(`dist/${id}/` + parseFile(file).slice(folderPath.length + 1), file);
+        // uploadFile(`dist/${id}/` + parseFile(file).slice(folderPath.length +  1), file);
+        uploadFile(`dist/${id}/` + file.slice(folderPath.length + 1), file);
     });
 }
 exports.copyFinalDist = copyFinalDist;

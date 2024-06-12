@@ -72,22 +72,23 @@ const uploadFile = async (fileName : string, localFilePath : string) => {
     }
 }
 
-const parseFile = (filepath : string) => {
-    let s = "";
-    for(let i=0;i<filepath.length;i++){
-        if(filepath[i] === '\\'){
-            s += '/'
-        } else {
-            s += filepath[i]
-        }
-    }
-    return s;
-}
+// const parseFile = (filepath : string) => {
+//     let s = "";
+//     for(let i=0;i<filepath.length;i++){
+//         if(filepath[i] === '\\'){
+//             s += '/'
+//         } else {
+//             s += filepath[i]
+//         }
+//     }
+//     return s;
+// }
 
 export function copyFinalDist (id: string) {
     const folderPath = path.join(__dirname, `output/${id}/dist`);
     const allFiles = getAllFiles(folderPath)
     allFiles.forEach(file => {
-        uploadFile(`dist/${id}/` + parseFile(file).slice(folderPath.length +  1), file);
+        // uploadFile(`dist/${id}/` + parseFile(file).slice(folderPath.length +  1), file);
+        uploadFile(`dist/${id}/` + file.slice(folderPath.length +  1), file);
     })
 }
