@@ -1,8 +1,9 @@
 import { createClient, commandOptions } from "redis";
 import { copyFinalDist, downloadS3Folder } from "./aws";
 import { buildproject } from "./utils";
-import axios from "axios";
 import { updatestatus } from "./updatestatus";
+import { deleteFolder } from "./deleteFolder";
+import path from "path"
 const subscriber = createClient()
 subscriber.connect()
 const publisher = createClient()
@@ -29,6 +30,9 @@ async function main () {
 
             publisher.hSet("status", id, "deploying...")
             await copyFinalDist(id); 
+            console.log("deleting files");
+            
+            await deleteFolder(path.join(__dirname, `output/${id}`))
 
             await updatestatus(id, "deployed")
 
