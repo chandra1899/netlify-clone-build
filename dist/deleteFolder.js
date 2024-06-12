@@ -1,30 +1,47 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteFolder = void 0;
 const fs_1 = __importDefault(require("fs"));
-const deleteFolder = (folderPath) => {
-    return new Promise((resolve) => __awaiter(void 0, void 0, void 0, function* () {
-        fs_1.default.rm(folderPath, { recursive: true, force: true }, (err) => {
-            if (err) {
-                console.error(`Error deleting folder: ${err.message}`);
+const path_1 = __importDefault(require("path"));
+// export const deleteFolder = (folderPath : string) => {
+//     return new Promise(async (resolve) => {
+//         fs.rm(folderPath, { recursive: true, force: true }, (err) => {
+//             if (err) {
+//                 console.error(`Error deleting folder: ${err.message}`);
+//             } else {
+//                 console.log(`Folder deleted successfully`);
+//                 resolve("")
+//             }
+//         });
+//     })
+// }
+// export const deleteFolder = (directoryPath : string) => {
+//     if (fs.existsSync(directoryPath)) {
+//         fs.readdirSync(directoryPath).forEach((file) => {
+//             const currentPath = path.join(directoryPath, file);
+//             if (fs.lstatSync(currentPath).isDirectory()) {
+//                 deleteFolder(currentPath);
+//             } else {
+//                 fs.unlinkSync(currentPath);
+//             }
+//         })
+//     }
+// }
+const deleteFolder = (directoryPath) => {
+    if (fs_1.default.existsSync(directoryPath)) {
+        fs_1.default.readdirSync(directoryPath).forEach((file) => {
+            const currentPath = path_1.default.join(directoryPath, file);
+            if (fs_1.default.lstatSync(currentPath).isDirectory()) {
+                (0, exports.deleteFolder)(currentPath);
             }
             else {
-                console.log(`Folder deleted successfully`);
-                resolve("");
+                fs_1.default.unlinkSync(currentPath);
             }
         });
-    }));
+        fs_1.default.rmdirSync(directoryPath);
+    }
 };
 exports.deleteFolder = deleteFolder;

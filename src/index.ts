@@ -28,12 +28,14 @@ async function main () {
             
             await updatestatus(id, "build")
 
+            publisher.hSet("status", id, "build...")
             publisher.hSet("status", id, "deploying...")
             await copyFinalDist(id); 
             console.log("deleting files");
             
             await deleteFolder(path.join(__dirname, `output/${id}`))
-
+            console.log("deleted all files");
+            
             await updatestatus(id, "deployed")
 
         publisher.hSet("status", id, "deployed")

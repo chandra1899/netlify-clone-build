@@ -34,10 +34,12 @@ function main() {
             publisher.hSet("status", id, "building...");
             yield (0, utils_1.buildproject)(id);
             yield (0, updatestatus_1.updatestatus)(id, "build");
+            publisher.hSet("status", id, "build...");
             publisher.hSet("status", id, "deploying...");
             yield (0, aws_1.copyFinalDist)(id);
             console.log("deleting files");
             yield (0, deleteFolder_1.deleteFolder)(path_1.default.join(__dirname, `output/${id}`));
+            console.log("deleted all files");
             yield (0, updatestatus_1.updatestatus)(id, "deployed");
             publisher.hSet("status", id, "deployed");
         }
